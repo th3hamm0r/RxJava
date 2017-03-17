@@ -10,7 +10,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Original License: https://github.com/JCTools/JCTools/blob/master/LICENSE
  * Original location: https://github.com/JCTools/JCTools/blob/master/jctools-core/src/main/java/org/jctools/queues/MpmcArrayQueue.java
  */
@@ -19,60 +19,6 @@ package rx.internal.util.unsafe;
 import static rx.internal.util.unsafe.UnsafeAccess.UNSAFE;
 
 import rx.internal.util.SuppressAnimalSniffer;
-
-abstract class MpmcArrayQueueL1Pad<E> extends ConcurrentSequencedCircularArrayQueue<E> {
-    long p10, p11, p12, p13, p14, p15, p16;
-    long p30, p31, p32, p33, p34, p35, p36, p37;
-
-    public MpmcArrayQueueL1Pad(int capacity) {
-        super(capacity);
-    }
-}
-
-@SuppressAnimalSniffer
-abstract class MpmcArrayQueueProducerField<E> extends MpmcArrayQueueL1Pad<E> {
-    private final static long P_INDEX_OFFSET = UnsafeAccess.addressOf(MpmcArrayQueueProducerField.class, "producerIndex");
-    private volatile long producerIndex;
-
-    public MpmcArrayQueueProducerField(int capacity) {
-        super(capacity);
-    }
-
-    protected final long lvProducerIndex() {
-        return producerIndex;
-    }
-
-    protected final boolean casProducerIndex(long expect, long newValue) {
-        return UNSAFE.compareAndSwapLong(this, P_INDEX_OFFSET, expect, newValue);
-    }
-}
-
-abstract class MpmcArrayQueueL2Pad<E> extends MpmcArrayQueueProducerField<E> {
-    long p20, p21, p22, p23, p24, p25, p26;
-    long p30, p31, p32, p33, p34, p35, p36, p37;
-
-    public MpmcArrayQueueL2Pad(int capacity) {
-        super(capacity);
-    }
-}
-
-@SuppressAnimalSniffer
-abstract class MpmcArrayQueueConsumerField<E> extends MpmcArrayQueueL2Pad<E> {
-    private final static long C_INDEX_OFFSET = UnsafeAccess.addressOf(MpmcArrayQueueConsumerField.class, "consumerIndex");
-    private volatile long consumerIndex;
-
-    public MpmcArrayQueueConsumerField(int capacity) {
-        super(capacity);
-    }
-
-    protected final long lvConsumerIndex() {
-        return consumerIndex;
-    }
-
-    protected final boolean casConsumerIndex(long expect, long newValue) {
-        return UNSAFE.compareAndSwapLong(this, C_INDEX_OFFSET, expect, newValue);
-    }
-}
 
 /**
  * A Multi-Producer-Multi-Consumer queue based on a {@link ConcurrentCircularArrayQueue}. This implies that
@@ -94,7 +40,7 @@ abstract class MpmcArrayQueueConsumerField<E> extends MpmcArrayQueueL2Pad<E> {
  * <li>Power of 2 capacity: Actual elements buffer (and sequence buffer) is the closest power of 2 larger or
  * equal to the requested capacity.
  * </ol>
- * 
+ *
  * @param <E>
  *            type of the element stored in the {@link java.util.Queue}
  */
